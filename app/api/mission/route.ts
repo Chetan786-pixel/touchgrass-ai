@@ -1,119 +1,112 @@
-
 import { NextResponse } from "next/server";
+
+const missions = {
+  Nature: [
+    {
+      title: "Notice the Little Things",
+      emoji: "🌿",
+      category: "Nature",
+      description: "Spend time noticing small details in the natural world around you.",
+      steps: [
+        "Find a safe outdoor place where you are allowed to spend time.",
+        "Observe three different plants, leaves, or natural details.",
+        "Take a quiet moment to appreciate what you noticed.",
+      ],
+    },
+    {
+      title: "Sky Watch",
+      emoji: "☁️",
+      category: "Nature",
+      description: "Take a short break outdoors and observe the sky.",
+      steps: [
+        "Choose a safe place to stand or sit.",
+        "Notice the clouds, light, and changing shapes in the sky.",
+        "Describe three things you observed.",
+      ],
+    },
+  ],
+  Birds: [
+    {
+      title: "Bird Listener",
+      emoji: "🐦",
+      category: "Birds",
+      description: "Notice birds and their sounds without disturbing them.",
+      steps: [
+        "Choose a safe outdoor place and remain at a respectful distance.",
+        "Listen for bird calls and watch for movement.",
+        "Record three observations without approaching nests or wildlife.",
+      ],
+    },
+    {
+      title: "Bird Spotting",
+      emoji: "🪶",
+      category: "Birds",
+      description: "Look for birds in their natural surroundings.",
+      steps: [
+        "Find a safe spot where birdwatching is allowed.",
+        "Observe birds from a distance without feeding or touching them.",
+        "Notice their colours, movements, or sounds.",
+      ],
+    },
+  ],
+  Garden: [
+    {
+      title: "Garden Explorer",
+      emoji: "🌼",
+      category: "Garden",
+      description: "Explore the colours and textures of a garden or planted area.",
+      steps: [
+        "Visit a garden or planted area where entry is allowed.",
+        "Notice three different leaf shapes or flower colours.",
+        "Leave plants and insects undisturbed.",
+      ],
+    },
+    {
+      title: "Green Break",
+      emoji: "🪴",
+      category: "Garden",
+      description: "Enjoy a mindful break among plants and greenery.",
+      steps: [
+        "Choose a safe garden or green outdoor space.",
+        "Observe the plants, light, and natural sounds around you.",
+        "Name three details you had not noticed before.",
+      ],
+    },
+  ],
+};
 
 export async function POST(request: Request) {
   try {
     const { minutes, interest } = await request.json();
+    const selectedMinutes = Number(minutes);
 
-    const allowedMinutes = [15, 30, 60];
-    const allowedInterests = ["Nature", "Birds", "Garden"];
-
-    if (!allowedMinutes.includes(Number(minutes))) {
+    if (![15, 30, 60].includes(selectedMinutes)) {
       return NextResponse.json(
         { error: "Please select 15, 30, or 60 minutes." },
         { status: 400 }
       );
     }
 
-    if (!allowedInterests.includes(interest)) {
+    if (!["Nature", "Birds", "Garden"].includes(interest)) {
       return NextResponse.json(
         { error: "Please select a valid interest." },
         { status: 400 }
       );
     }
 
-    const response = await fetch(
-      "http://localhost:11434/api/generate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gemma3:1b",
-          stream: false,
-          format: "json",
-          prompt: `You are TouchGrass AI, a safe outdoor activity assistant.
+    const options = missions[interest as keyof typeof missions];
+    const selected = options[Math.floor(Math.random() * options.length)];
 
-Create one practical outdoor mission.
-Available time: ${Number(minutes)} minutes maximum.
-Interest: ${interest}.
-
-Return a valid JSON object with:
-"title": string,
-"emoji": string,
-"category": string,
-"description": string,
-"duration": number,
-"steps": array of exactly 3 strings.
-
-Rules:
-- Duration must be between 1 and ${Number(minutes)} minutes.
-- Never assume the user's city or location.
-- Do not invent park names, addresses, or specific locations.
-- Suggest a familiar, safe public outdoor area when appropriate.
-- Match the selected interest.
-- Suggest only safe, legal, accessible activities.
-- Use simple English.
-- Each step must be plain text without numbering.
-- Return JSON only, without markdown fences.`,
-        }),
-        signal: AbortSignal.timeout(120000),
-      }
-    );
-
-    if (!response.ok) {
-      const details = await response.text();
-      throw new Error(
-        `Ollama request failed (${response.status}): ${details}`
-      );
-    }
-
-    const result = await response.json();
-
-    if (typeof result.response !== "string") {
-      throw new Error("Ollama returned an empty response.");
-    }
-
-    const mission = JSON.parse(result.response);
-
-  if (
-  typeof mission.title !== "string" ||
-  typeof mission.description !== "string" ||
-  !Array.isArray(mission.steps) ||
-  mission.steps.length === 0 ||
-  !mission.steps.every((step: unknown) => typeof step === "string")
-) {
-  console.error("Invalid mission received from AI:", mission);
-  throw new Error("AI returned an invalid mission format.");
-}
-
-    const duration = Number(mission.duration);
-
-    if (!Number.isFinite(duration) || duration < 1) {
-      throw new Error("AI returned an invalid mission duration.");
-    }
-
-    mission.duration = Math.min(duration, Number(minutes));
-    mission.emoji =
-      typeof mission.emoji === "string" ? mission.emoji : "🌿";
-    mission.category =
-      typeof mission.category === "string"
-        ? mission.category
-        : "Explore";
+    const mission = {
+      ...selected,
+      duration: Math.min(selectedMinutes, 15),
+    };
 
     return NextResponse.json({ mission });
-  } catch (error) {
-    console.error("Mission generation error:", error);
-
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Unknown error occurred.";
-
+  } catch {
     return NextResponse.json(
-      { error: message },
-      { status: 500 }
+      { error: "Could not generate a mission. Please try again." },
+      { status: 400 }
     );
   }
 }
