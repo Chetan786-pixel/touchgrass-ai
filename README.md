@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# 🌿 TouchGrassAI
 
-First, run the development server:
+### Your world is bigger than your screen.
+
+TouchGrassAI is an AI-powered outdoor activity generator that helps people spend less time scrolling and more time exploring the world around them.
+
+Choose how much time you have and what you enjoy. Local Gemma AI generates a practical outdoor mission with actionable steps.
+
+## ✨ Features
+
+- 🌱 **AI-generated missions** tailored to your available time and interests.
+- ⏱️ **Flexible durations** of 15, 30, or 60 minutes.
+- 🌿 **Multiple interests:** Nature exploration, birdwatching, and gardening.
+- ✅ **Interactive progress tracking** for mission steps.
+- 🎯 **Mission completion tracking** and the option to generate another mission.
+- 🔒 **Local AI inference** through Ollama, using the Gemma 3 1B model.
+
+## 🛠️ Tech Stack
+
+- Next.js with App Router
+- React and TypeScript
+- Tailwind CSS
+- Ollama
+- Gemma 3 1B
+
+## ⚙️ Prerequisites
+
+Install the following before running the project:
+
+- Node.js and npm
+- Ollama
+- Git
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Chetan786-pixel/touchgrass-ai.git
+cd touchgrass-ai
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Download the AI model
+
+Make sure Ollama is installed and running, then execute:
+
+```bash
+ollama pull gemma3:1b
+```
+
+Verify that the model is available:
+
+```bash
+ollama list
+```
+
+### 4. Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧠 How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Choose:** Select your available time and preferred outdoor activity.
+2. **Generate:** The Next.js API route sends a prompt to the locally running Ollama service.
+3. **Explore:** Gemma generates an outdoor mission with steps.
+4. **Track:** Mark steps as complete and track your progress.
 
-## Learn More
+## 🔌 Local AI Configuration
 
-To learn more about Next.js, take a look at the following resources:
+The mission API is available at:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`POST /api/mission`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+It uses the local Ollama API at `http://localhost:11434` and the `gemma3:1b` model. Ollama must be running on the same machine as the Next.js server for the default setup to work.
 
-## Deploy on Vercel
+## 📌 Deployment Note
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This version is designed for local development. A standard cloud deployment cannot access Ollama running on your personal computer through `localhost`. Cloud deployment requires an appropriately hosted AI service or a separately accessible backend.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌍 Project Vision
+
+TouchGrassAI encourages real-world experiences, curiosity, and healthier use of screen time through small, achievable outdoor adventures.
+
+---
+
+Built with 🌿 for a world beyond the screen.
